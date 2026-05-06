@@ -1,0 +1,14 @@
+=== Push Started: Fri May  1 03:35:29 AM UTC 2026 ===
+26/05/01 03:35:30 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by org.apache.hadoop.hbase.unsafe.HBasePlatformDependent (file:/home/parth/phoenix/phoenix-client-embedded-hbase-2.5-5.1.3.jar) to method java.nio.Bits.unaligned()
+WARNING: Please consider reporting this to the maintainers of org.apache.hadoop.hbase.unsafe.HBasePlatformDependent
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+csv columns from user. length=15, SALT_BUCKET, SERIAL_NUMBER, EVENT_DATE, MODEL, CAPACITY_BYTES, DATACENTER, CLUSTER_ID, FAILURE, SMART_5_RAW, SMART_9_RAW, SMART_187_RAW, SMART_188_RAW, SMART_197_RAW, SMART_198_RAW, SMART_199_RAW
+CSV Upsert complete. 1000000 rows upserted
+Time: 108.993 sec(s)
+
+Duration: 112.261824141 seconds
+=== Push Completed: Fri May  1 03:37:21 AM UTC 2026 ===
+

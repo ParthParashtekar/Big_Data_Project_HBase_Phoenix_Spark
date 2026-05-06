@@ -1,0 +1,18 @@
+===============================
+SPARK DATA PROFILING - 5M
+===============================
+Input: /home/parth/bigdata_project/clean/smart_telemetry_5M.csv
+Output: /home/parth/bigdata_project/results/spark_profile_5M
+
+Total rows: 5000000
+
+Generated outputs:
+- summary
+- failure_distribution
+- risk_distribution
+- top_models
+- date_distribution
+- null_counts
+- smart_stats
+
+Spark profiling completed successfully.
