@@ -1,0 +1,35 @@
+===============================
+CRUD BENCHMARK RESULTS
+===============================
+
+Table: smart_telemetry_crud_test
+Rows per operation: 100
+
+Operation: single_row_insert_100_rows
+Rows: 100
+Average Time: 3.2201 seconds
+Min Time: 3.0537 seconds
+Max Time: 3.5689 seconds
+Total Time: 322.0067 seconds
+--------------------------------
+Operation: update_non_indexed_column_model_100_rows
+Rows: 100
+Average Time: 3.2508 seconds
+Min Time: 3.0398 seconds
+Max Time: 3.9133 seconds
+Total Time: 325.0753 seconds
+--------------------------------
+Operation: update_indexed_column_smart197_100_rows
+Rows: 100
+Average Time: 3.2362 seconds
+Min Time: 2.9841 seconds
+Max Time: 4.2591 seconds
+Total Time: 323.6176 seconds
+--------------------------------
+Operation: delete_by_primary_key_100_rows
+Rows: 100
+Average Time: 3.2711 seconds
+Min Time: 2.9724 seconds
+Max Time: 3.5748 seconds
+Total Time: 327.1078 seconds
+--------------------------------

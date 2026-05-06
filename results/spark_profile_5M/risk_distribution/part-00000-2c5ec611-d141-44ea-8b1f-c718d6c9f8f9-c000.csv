@@ -1,0 +1,4 @@
+condition,count,percentage
+smart_197_raw > 0,56681,1.1336199999999999
+smart_5_raw > 0,174603,3.4920600000000004
+smart_197_raw > 0 OR smart_5_raw > 0,208765,4.1753

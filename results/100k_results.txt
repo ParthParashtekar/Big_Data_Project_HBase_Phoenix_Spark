@@ -1,0 +1,119 @@
+===============================
+100K EXPERIMENT RESULTS
+===============================
+
+Dataset Size:
+- Total Rows: 100,000
+
+--------------------------------
+DATA DISTRIBUTION
+--------------------------------
+- smart_197_raw > 0 : 1170 rows
+- smart_5_raw > 0   : 5902 rows
+
+--------------------------------
+BASELINE (NO INDEX)
+--------------------------------
+
+Query 1:
+SELECT COUNT(*) FROM smart_telemetry WHERE smart_197_raw > 0;
+
+Execution Times (seconds):
+0.679, 0.667, 0.654, 0.660
+
+Average Time:
+~0.665 seconds
+
+Query Plan:
+FULL SCAN OVER SMART_TELEMETRY
+
+
+Query 2:
+SELECT COUNT(*) FROM smart_telemetry WHERE smart_5_raw > 0;
+
+Execution Times (seconds):
+0.575, 0.590, 0.564, 0.569
+
+Average Time:
+~0.575 seconds
+
+Query Plan:
+FULL SCAN OVER SMART_TELEMETRY
+
+--------------------------------
+INDEX CREATION
+--------------------------------
+
+CREATE INDEX idx_failure_date:
+Time: ~5.825 seconds
+
+CREATE INDEX idx_smart197_date:
+Time: ~5.724 seconds
+
+CREATE INDEX idx_smart5_date:
+Time: ~5.763 seconds
+
+Total Index Build Time:
+~17 seconds
+
+--------------------------------
+INDEXED PERFORMANCE
+--------------------------------
+
+Query 1:
+SELECT COUNT(*) FROM smart_telemetry WHERE smart_197_raw > 0;
+
+Execution Time:
+~0.083 seconds
+
+Query Plan:
+RANGE SCAN OVER IDX_SMART197_DATE
+
+
+Query 2:
+SELECT COUNT(*) FROM smart_telemetry WHERE smart_5_raw > 0;
+
+Execution Time:
+~0.093 seconds
+
+Query Plan:
+RANGE SCAN OVER IDX_SMART5_DATE
+
+--------------------------------
+PERFORMANCE IMPROVEMENT
+--------------------------------
+
+smart_197_raw query:
+Before: ~0.665 s
+After : ~0.083 s
+Speedup: ~8.0x
+
+smart_5_raw query:
+Before: ~0.575 s
+After : ~0.093 s
+Speedup: ~6.2x
+
+--------------------------------
+KEY OBSERVATIONS
+--------------------------------
+
+1. Secondary indexing significantly reduces query execution time
+   for selective filters.
+
+2. Query execution plans transition from FULL SCAN to RANGE SCAN,
+   indicating efficient index utilization.
+
+3. Index creation introduces overhead (~5.7 seconds per index),
+   but this cost is amortized over repeated query execution.
+
+4. Performance improvement becomes more pronounced as dataset size increases.
+
+--------------------------------
+CONCLUSION
+--------------------------------
+
+At 100k records, Apache Phoenix indexing provides substantial
+performance gains (6–8x) by avoiding full table scans and enabling
+direct index-based access. The tradeoff between index creation time
+and query efficiency is justified for analytical workloads with
+frequent query execution.

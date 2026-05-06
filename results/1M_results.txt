@@ -1,0 +1,124 @@
+===============================
+1M EXPERIMENT RESULTS
+===============================
+
+Dataset Size:
+- Total Rows: 1,000,000
+
+--------------------------------
+DATA DISTRIBUTION
+--------------------------------
+- smart_197_raw > 0 : 11,894 rows
+- smart_5_raw > 0   : 36,523 rows
+
+--------------------------------
+BASELINE (NO INDEX)
+--------------------------------
+
+Query 1:
+SELECT COUNT(*) FROM smart_telemetry WHERE smart_197_raw > 0;
+
+Execution Times (seconds):
+7.508, 7.575, 7.394, 7.492, 7.514
+
+Average Time:
+~7.497 seconds
+
+Query Plan:
+FULL SCAN OVER SMART_TELEMETRY
+
+
+Query 2:
+SELECT COUNT(*) FROM smart_telemetry WHERE smart_5_raw > 0;
+
+Execution Times (seconds):
+6.222, 6.248, 6.334, 6.288, 6.291
+
+Average Time:
+~6.277 seconds
+
+Query Plan:
+FULL SCAN OVER SMART_TELEMETRY
+
+--------------------------------
+INDEX CREATION
+--------------------------------
+
+CREATE INDEX idx_failure_date:
+Time: 17.231 seconds
+
+CREATE INDEX idx_smart197_date:
+Time: 17.891 seconds
+
+CREATE INDEX idx_smart5_date:
+Time: 18.036 seconds
+
+Total Index Build Time:
+~53.158 seconds
+
+--------------------------------
+INDEXED PERFORMANCE
+--------------------------------
+
+Query 1:
+SELECT COUNT(*) FROM smart_telemetry WHERE smart_197_raw > 0;
+
+Execution Time:
+0.077 seconds
+
+Query Plan:
+RANGE SCAN OVER IDX_SMART197_DATE
+
+
+Query 2:
+SELECT COUNT(*) FROM smart_telemetry WHERE smart_5_raw > 0;
+
+Execution Time:
+0.174 seconds
+
+Query Plan:
+RANGE SCAN OVER IDX_SMART5_DATE
+
+--------------------------------
+PERFORMANCE IMPROVEMENT
+--------------------------------
+
+smart_197_raw query:
+Before: ~7.497 s
+After : 0.077 s
+Speedup: ~97.4x
+
+smart_5_raw query:
+Before: ~6.277 s
+After : 0.174 s
+Speedup: ~36.1x
+
+--------------------------------
+KEY OBSERVATIONS
+--------------------------------
+
+1. At 1M records, full table scans became substantially slower,
+   reaching 6–7.5 seconds for SMART attribute filters.
+
+2. Secondary indexes reduced query latency to below 0.2 seconds for both
+   benchmark queries.
+
+3. Phoenix execution plans changed from full scans over SMART_TELEMETRY
+   to range scans over secondary index tables.
+
+4. Index creation overhead increased with dataset size, taking roughly
+   17–18 seconds per index at 1M rows.
+
+5. The read-performance benefit was substantial for repeated analytical
+   queries, with observed speedups of ~97.4x and ~36.1x.
+
+--------------------------------
+CONCLUSION
+--------------------------------
+
+At 1M records, Apache Phoenix secondary indexing produced major query
+performance improvements over HBase-backed SMART telemetry data. The results
+show that Phoenix provides an effective SQL interface over HBase while enabling
+index-based query optimization. The tradeoff is additional index build and
+maintenance cost, but for repeated analytical workloads, the performance gains
+are significant.

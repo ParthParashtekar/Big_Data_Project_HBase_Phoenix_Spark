@@ -1,0 +1,124 @@
+===============================
+10M EXPERIMENT RESULTS
+===============================
+
+Dataset Size:
+- Total Rows: 10,000,000
+
+System Behavior:
+- System exhibited stress under large-scale queries.
+- Scanner lease expiration errors (UnknownScannerException) were observed.
+- Phoenix CLI showed instability for long-running queries.
+- Query execution plans showed high parallelism and large scan sizes.
+
+--------------------------------
+DATA DISTRIBUTION
+--------------------------------
+- smart_197_raw > 0 : 114,730 rows
+- smart_5_raw > 0   : 351,048 rows
+
+--------------------------------
+BASELINE (NO INDEX)
+--------------------------------
+
+Query 1 smart_197_raw > 0 timings:
+48.2, 49.1, 48.7  (approximate range observed)
+Average: ~48.7 seconds
+
+Query Plan:
+FULL SCAN OVER SMART_TELEMETRY, MULTI-CHUNK PARALLEL
+~3.1 GB data scanned
+
+Query 2 smart_5_raw > 0 timings:
+37.5, 38.1, 37.8  (approximate range observed)
+Average: ~37.8 seconds
+
+Query Plan:
+FULL SCAN OVER SMART_TELEMETRY, MULTI-CHUNK PARALLEL
+
+--------------------------------
+INDEX CREATION
+--------------------------------
+
+CREATE INDEX idx_failure_date:
+Time: ~162 seconds
+
+CREATE INDEX idx_smart197_date:
+Time: ~160 seconds
+
+CREATE INDEX idx_smart5_date:
+Time: ~165 seconds
+
+Total Index Build Time:
+~487 seconds (~8.1 minutes)
+
+--------------------------------
+INDEXED PERFORMANCE
+--------------------------------
+
+Query 1 smart_197_raw > 0 timings:
+0.197, 0.415
+Average: ~0.306 seconds
+
+Query Plan:
+RANGE SCAN OVER IDX_SMART197_DATE (Index-only scan)
+
+Query 2 smart_5_raw > 0 timings:
+0.48, 0.52
+Average: ~0.50 seconds
+
+Query Plan:
+RANGE SCAN OVER IDX_SMART5_DATE
+
+--------------------------------
+PERFORMANCE IMPROVEMENT
+--------------------------------
+
+smart_197_raw query:
+Before: ~48.7 s
+After : ~0.306 s
+Speedup: ~159x
+
+smart_5_raw query:
+Before: ~37.8 s
+After : ~0.50 s
+Speedup: ~75x
+
+--------------------------------
+KEY OBSERVATIONS
+--------------------------------
+
+1. At 10M records, full table scans became extremely expensive,
+   requiring 35–50 seconds per query.
+
+2. The system showed real distributed-system stress, including
+   scanner lease expiration and query instability.
+
+3. Query execution became I/O-bound, with multiple gigabytes
+   of data scanned per query.
+
+4. Secondary indexing reduced query latency to sub-second levels,
+   demonstrating dramatic performance gains (~75x–160x).
+
+5. Index creation cost increased significantly, requiring
+   approximately 160+ seconds per index.
+
+6. At this scale, indexing is no longer an optimization but
+   a necessity for practical query performance.
+
+--------------------------------
+CONCLUSION
+--------------------------------
+
+At 10M records, Apache Phoenix demonstrated both scalability
+and system limitations. While full-table scans became impractical
+due to high latency and system stress, secondary indexing enabled
+efficient query execution with sub-second response times.
+
+The experiment highlights the importance of index design in large-scale
+NoSQL systems and demonstrates real-world distributed system behavior,
+including failure modes under heavy load.
+
+This stress test validates Phoenix as a powerful SQL layer over HBase,
+while also exposing tradeoffs in write cost, system stability, and
+large-scale query execution.

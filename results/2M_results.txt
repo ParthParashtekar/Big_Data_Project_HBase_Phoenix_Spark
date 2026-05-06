@@ -1,0 +1,141 @@
+===============================
+2M EXPERIMENT RESULTS
+===============================
+
+Dataset Size:
+- Total Rows: 2,000,000
+
+--------------------------------
+SYSTEM BEHAVIOR
+--------------------------------
+
+During initial query execution, Phoenix reported:
+
+ERROR 1108 (XCL08): Cache of region boundaries are out of date.
+
+Resolution:
+- Closed Phoenix connection using !closeall
+- Reconnected using sqlline.py localhost
+- Query succeeded after reconnect
+
+Observation:
+At 2M records, HBase region splitting caused Phoenix client metadata/cache
+to become stale. Reconnecting refreshed region boundary metadata.
+
+--------------------------------
+DATA DISTRIBUTION
+--------------------------------
+- smart_197_raw > 0 : 22,634 rows
+- smart_5_raw > 0   : 70,272 rows
+
+--------------------------------
+BASELINE (NO INDEX)
+--------------------------------
+
+Query 1:
+SELECT COUNT(*) FROM smart_telemetry WHERE smart_197_raw > 0;
+
+Execution Times (seconds):
+9.032, 8.748, 7.762, 7.957, 7.805
+
+Average Time:
+~8.261 seconds
+
+Query Plan:
+CLIENT 4-CHUNK PARALLEL FULL SCAN OVER SMART_TELEMETRY
+
+
+Query 2:
+SELECT COUNT(*) FROM smart_telemetry WHERE smart_5_raw > 0;
+
+Execution Times (seconds):
+7.743, 6.673, 6.826, 6.719, 6.809
+
+Average Time:
+~6.954 seconds
+
+Query Plan:
+CLIENT 4-CHUNK PARALLEL FULL SCAN OVER SMART_TELEMETRY
+
+--------------------------------
+INDEX CREATION
+--------------------------------
+
+CREATE INDEX idx_failure_date:
+Time: 25.701 seconds
+
+CREATE INDEX idx_smart197_date:
+Time: 24.495 seconds
+
+CREATE INDEX idx_smart5_date:
+Time: 23.789 seconds
+
+Total Index Build Time:
+~73.985 seconds
+
+--------------------------------
+INDEXED PERFORMANCE
+--------------------------------
+
+Query 1:
+SELECT COUNT(*) FROM smart_telemetry WHERE smart_197_raw > 0;
+
+Execution Time:
+0.144 seconds
+
+Query Plan:
+RANGE SCAN OVER IDX_SMART197_DATE
+
+
+Query 2:
+SELECT COUNT(*) FROM smart_telemetry WHERE smart_5_raw > 0;
+
+Execution Time:
+0.228 seconds
+
+Query Plan:
+RANGE SCAN OVER IDX_SMART5_DATE
+
+--------------------------------
+PERFORMANCE IMPROVEMENT
+--------------------------------
+
+smart_197_raw query:
+Before: ~8.261 s
+After : 0.144 s
+Speedup: ~57.3x
+
+smart_5_raw query:
+Before: ~6.954 s
+After : 0.228 s
+Speedup: ~30.5x
+
+--------------------------------
+KEY OBSERVATIONS
+--------------------------------
+
+1. At 2M records, full table scans required approximately 7–9 seconds.
+
+2. Phoenix secondary indexing reduced query latency to under 0.25 seconds.
+
+3. Execution plans changed from parallel full scans over SMART_TELEMETRY
+   to range scans over Phoenix secondary index tables.
+
+4. The no-index plan used 4 chunks, indicating that HBase had begun splitting
+   data into multiple regions/chunks at larger scale.
+
+5. Phoenix encountered stale region boundary cache behavior after scaling,
+   which was resolved by reconnecting the client.
+
+6. Index build overhead increased with scale, reaching approximately
+   24–26 seconds per index.
+
+--------------------------------
+CONCLUSION
+--------------------------------
+
+At 2M records, Apache Phoenix secondary indexing continued to provide
+substantial query performance gains over HBase-backed SMART telemetry data.
+The experiment also exposed real distributed-system behavior, including region
+boundary cache staleness after HBase region changes. Despite this, the system
+remained recoverable and indexed query performance remained strong.

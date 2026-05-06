@@ -1,0 +1,69 @@
+===============================
+5M EXPERIMENT RESULTS
+===============================
+
+Dataset Size:
+- Total Rows: 5,000,000
+
+System Behavior:
+- No Phoenix region-boundary cache error was observed during this run.
+- Query plans showed CLIENT 6-CHUNK parallel full scans before indexing.
+
+Data Distribution:
+- smart_197_raw > 0 : 56,681 rows
+- smart_5_raw > 0   : 174,603 rows
+
+Baseline No Index:
+Query 1 smart_197_raw > 0 timings:
+20.949, 21.163, 21.508, 20.782, 20.827
+Average: ~21.046 seconds
+Plan: FULL SCAN OVER SMART_TELEMETRY, CLIENT 6-CHUNK
+
+Query 2 smart_5_raw > 0 timings:
+18.324, 17.999, 18.183, 18.378, 18.407
+Average: ~18.258 seconds
+Plan: FULL SCAN OVER SMART_TELEMETRY, CLIENT 6-CHUNK
+
+Index Creation:
+idx_failure_date: 76.234 seconds
+idx_smart197_date: 72.935 seconds
+idx_smart5_date: 77.144 seconds
+Total Index Build Time: ~226.313 seconds
+
+Indexed Performance:
+Query 1 smart_197_raw > 0 timings:
+0.139, 0.129
+Average: ~0.134 seconds
+Plan: RANGE SCAN OVER IDX_SMART197_DATE
+
+Query 2 smart_5_raw > 0 timings:
+0.327, 0.319
+Average: ~0.323 seconds
+Plan: RANGE SCAN OVER IDX_SMART5_DATE
+
+Performance Improvement:
+smart_197_raw:
+Before: ~21.046 s
+After : ~0.134 s
+Speedup: ~157.1x
+
+smart_5_raw:
+Before: ~18.258 s
+After : ~0.323 s
+Speedup: ~56.5x
+
+Key Observations:
+1. At 5M records, unindexed queries required approximately 18–21 seconds.
+2. Indexed queries completed in under 0.4 seconds.
+3. Phoenix execution plans shifted from 6-chunk parallel full scans to index-based range scans.
+4. Index build cost increased significantly, requiring about 72–77 seconds per index.
+5. The 5M run completed without the region-boundary cache error observed at 2M.
+
+Conclusion:
+At 5M records, Apache Phoenix secondary indexing delivered major query latency
+improvements over HBase-backed SMART telemetry data. The results demonstrate
+that Phoenix can provide SQL access over HBase while achieving substantial
+performance gains through secondary indexes. The tradeoff is higher index
+creation and maintenance cost, but the benefit is highly favorable for repeated
+analytical queries.
+

@@ -1,0 +1,16 @@
+Dataset size: 10000
+
+Query 1:
+SELECT COUNT(*) FROM smart_telemetry WHERE failure = 1;
+Result: 0
+Time: 0.133 seconds
+Plan: FULL SCAN OVER SMART_TELEMETRY
+
+Query 2:
+SELECT serial_number, event_date, smart_197_raw
+FROM smart_telemetry
+WHERE smart_197_raw > 0
+LIMIT 10;
+Result: 10 rows
+Time: 0.036 seconds
+Plan: FULL SCAN OVER SMART_TELEMETRY

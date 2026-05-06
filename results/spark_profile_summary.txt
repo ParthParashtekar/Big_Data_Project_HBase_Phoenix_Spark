@@ -1,0 +1,49 @@
+===============================
+SPARK DATA PROFILING SUMMARY
+===============================
+
+Dataset:
+- File: smart_telemetry_5M.csv
+- Total Rows: 5,000,000
+
+Failure Distribution:
+- failure = 0: 4,999,789 rows (99.99578%)
+- failure = 1: 211 rows (0.00422%)
+
+SMART Risk Distribution:
+- smart_197_raw > 0: 56,681 rows (1.13362%)
+- smart_5_raw > 0: 174,603 rows (3.49206%)
+- smart_197_raw > 0 OR smart_5_raw > 0: 208,765 rows (4.1753%)
+
+SMART Attribute Summary:
+- avg_smart_197_raw: 0.7929826
+- max_smart_197_raw: 156,776
+- avg_smart_5_raw: 29.0738022
+- max_smart_5_raw: 65,520
+- avg_smart_198_raw: 0.620811
+- max_smart_198_raw: 156,776
+- avg_smart_199_raw: 3.2200486
+- max_smart_199_raw: 50,950
+
+Missing Values:
+- datacenter: 19,944 missing values
+- all other selected columns: 0 missing values
+
+Top Drive Models:
+1. TOSHIBA MG07ACA14TA: 695,391
+2. TOSHIBA MG08ACA16TA: 607,683
+3. ST16000NM001G: 495,595
+4. WDC WUH721816ALE6L4: 388,959
+5. ST12000NM0008: 354,318
+
+Key Observations:
+1. Failure events are extremely rare in the dataset.
+2. SMART risk attributes are sparse but meaningful.
+3. smart_197_raw and smart_5_raw are good candidates for secondary indexing.
+4. Data quality is generally strong after cleaning, with missing values mainly in datacenter.
+5. Drive model distribution is skewed, with a few models contributing a large fraction of records.
+
+Conclusion:
+Spark profiling provided data-level evidence for schema and index selection.
+The sparsity of SMART risk attributes supports the use of Phoenix secondary
+indexes to optimize selective analytical queries over HBase-backed telemetry data.
